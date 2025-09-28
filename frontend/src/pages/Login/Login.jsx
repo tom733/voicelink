@@ -1,38 +1,66 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import ApiService from '../../services/api';
 
 const Login = () => {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if there's a success message from registration
+  useEffect(() => {
+    if (location.state?.message) {
+      setSuccessMessage(location.state.message);
+      // Clear the message from history
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleInputChange = (field, value) => {
     setLoginData(prev => ({
       ...prev,
       [field]: value
     }));
-    // Clear error when user starts typing
+    // Clear messages when user starts typing
     if (error) setError('');
+    if (successMessage) setSuccessMessage('');
   };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!loginData.email || !loginData.password) {
+      setError('Bitte füllen Sie alle Felder aus');
+      return;
+    }
+    
     setIsLoading(true);
     setError('');
 
     try {
-      // Hier würdest du dein Backend aufrufen
-      console.log('Login attempt:', loginData);
+      // Call Backend API
+      const result = await ApiService.loginUser({
+        email: loginData.email,
+        password: loginData.password
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Successful login - redirect to dashboard
-      navigate('/dashboard');
+      if (result.success) {
+        // Store user data (you might want to use localStorage or context)
+        localStorage.setItem('user', JSON.stringify(result.user));
+        
+        // Successful login - redirect to dashboard or home
+        console.log('Login successful:', result);
+        navigate('/dashboard'); // You'll need to create this page
+        
+      } else {
+        setError(result.error);
+      }
       
     } catch (error) {
-      setError('Login fehlgeschlagen. Bitte überprüfen Sie Ihre Eingaben.');
+      setError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
     } finally {
       setIsLoading(false);
     }
@@ -40,6 +68,10 @@ const Login = () => {
 
   const handleBackToHome = () => {
     navigate('/');
+  };
+
+  const handleRegisterRedirect = () => {
+    navigate('/register');
   };
 
   return (
@@ -57,6 +89,12 @@ const Login = () => {
 
         {/* Login Form */}
         <div className="bg-white py-8 px-6 shadow-lg rounded-lg">
+          {successMessage && (
+            <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+              {successMessage}
+            </div>
+          )}
+          
           {error && (
             <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
               {error}
@@ -76,6 +114,7 @@ const Login = () => {
                 className="w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="ihre@email.com"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -91,6 +130,7 @@ const Login = () => {
                 className="w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="••••••••"
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -100,12 +140,13 @@ const Login = () => {
                   id="remember-me"
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  disabled={isLoading}
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Angemeldet bleiben
                 </label>
               </div>
-              <button className="text-sm text-blue-600 hover:text-blue-500">
+              <button className="text-sm text-blue-600 hover:text-blue-500" disabled={isLoading}>
                 Passwort vergessen?
               </button>
             </div>
@@ -124,7 +165,11 @@ const Login = () => {
         <div className="text-center space-y-4">
           <p className="text-gray-600">
             Noch kein Account?{' '}
-            <button className="text-blue-600 hover:text-blue-500 font-medium">
+            <button 
+              onClick={handleRegisterRedirect}
+              className="text-blue-600 hover:text-blue-500 font-medium"
+              disabled={isLoading}
+            >
               Jetzt registrieren
             </button>
           </p>
@@ -132,6 +177,7 @@ const Login = () => {
           <button
             onClick={handleBackToHome}
             className="text-gray-500 hover:text-gray-700 text-sm"
+            disabled={isLoading}
           >
             ← Zurück zur Startseite
           </button>
