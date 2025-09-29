@@ -32,32 +32,38 @@ class ApiService {
 
   // Login user
   async loginUser(credentials) {
-    try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password
-        })
-      });
+  try {
+    const response = await fetch(`${API_BASE_URL}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: credentials.email,
+        password: credentials.password
+      })
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      localStorage.setItem('token', data.access_token);
-      localStorage.setItem('userId', data.user_id);
-
-      if (!response.ok) {
-        throw new Error(data.detail || 'Login fehlgeschlagen');
-      }
-
-      return { success: true, user: data.user, message: data.message };
-    } catch (error) {
-      return { success: false, error: error.message };
+    // Check response FIRST
+    if (!response.ok) {
+      throw new Error(data.detail || 'Login fehlgeschlagen');
     }
+
+    // Only store if login was successful AND tokens exist
+    if (data.access_token) {
+      localStorage.setItem('token', data.access_token);
+    }
+    if (data.user_id) {
+      localStorage.setItem('userId', data.user_id);
+    }
+
+    return { success: true, user: data.user, message: data.message };
+  } catch (error) {
+    return { success: false, error: error.message };
   }
+}
 
   // get current user profile
   async getUserProfile() {
