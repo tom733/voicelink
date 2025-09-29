@@ -136,7 +136,7 @@ const Register = () => {
 
           <div className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 text-lefts">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 text-left">
                 Vollständiger Name
               </label>
               <input
