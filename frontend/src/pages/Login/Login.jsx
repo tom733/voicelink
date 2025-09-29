@@ -53,7 +53,7 @@ const Login = () => {
         
         // Successful login - redirect to dashboard or home
         console.log('Login successful:', result);
-        navigate('/dashboard'); // You'll need to create this page
+        navigate('/dashboard');
         
       } else {
         setError(result.error);

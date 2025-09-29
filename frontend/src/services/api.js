@@ -4,6 +4,7 @@ class ApiService {
   
   // Register new user
   async registerUser(userData) {
+    console.log('Registering user with data:', userData);
     try {
       const response = await fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
@@ -45,11 +46,40 @@ class ApiService {
 
       const data = await response.json();
 
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('userId', data.user_id);
+
       if (!response.ok) {
         throw new Error(data.detail || 'Login fehlgeschlagen');
       }
 
       return { success: true, user: data.user, message: data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  // get current user profile
+  async getUserProfile() {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    if (!token || !userId) {
+      return { success: false, error: 'Nicht authentifiziert' };
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || 'Fehler beim Laden des Profils');
+      }
+
+      return { success: true, user: data };
     } catch (error) {
       return { success: false, error: error.message };
     }
