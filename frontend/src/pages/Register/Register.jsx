@@ -136,7 +136,7 @@ const Register = () => {
 
           <div className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 text-lefts">
                 Vollständiger Name
               </label>
               <input
@@ -152,7 +152,7 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-left">
                 E-Mail-Adresse
               </label>
               <input
@@ -168,7 +168,7 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2 text-left">
                 Passwort
               </label>
               <input
@@ -185,7 +185,7 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2 text-left">
                 Passwort bestätigen
               </label>
               <input
